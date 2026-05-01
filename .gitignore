@@ -1,0 +1,15 @@
+# ── Dependencies ──────────────────────────────────────────────────────────────
+node_modules/
+
+# ── Build output ──────────────────────────────────────────────────────────────
+dist/
+
+# ── Environment — local overrides (never commit) ──────────────────────────────
+.env.local
+.env.*.local
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+*.swp
+.idea/
+.vscode/settings.json
