@@ -1,0 +1,162 @@
+spectaql:
+  # Output directory — open docs/index.html in a browser after running `npm run docs`
+  targetDir: ./docs/out
+  displayAllServers: true
+
+introspection:
+  # SpectaQL introspects the running server OR reads the SDL directly.
+  # Use schemaFile (no server needed) for CI / offline generation.
+  schemaFile: ./src/schema.ts
+  # When the server is running, you can switch to live introspection:
+  # url: http://localhost:4000/graphql
+
+info:
+  title: Luxe GraphQL API
+  description: |
+    ## Overview
+    The Luxe GraphQL API powers the Luxe e-commerce storefront.
+
+    All amounts are expressed in **cents (USD)** — e.g. `2495` = $24.95.
+
+    ## Environments
+
+    | Environment | URL |
+    |-------------|-----|
+    | Local dev   | `http://localhost:4000/graphql` |
+    | Staging     | `https://graphql-api.staging.luxe.com/graphql` |
+    | Production  | `https://graphql-api.luxe.com/graphql` |
+
+    ## Data source
+    - **Mock mode** (default): resolvers read from `data/*.json` files.
+      No external dependencies.
+    - **Production mode**: set `JAVA_API_URL` in `.env` to proxy all
+      operations to the Java REST backend. No schema or query changes required.
+
+    ## Authentication
+    The `login` and `register` mutations simulate Okta's Authorization Server
+    in mock mode. In production they delegate to the Java auth service which
+    validates Okta JWTs. Pass the returned `token` as `Authorization: Bearer <token>`.
+
+    ## Promo codes (mock)
+    | Code       | Effect                  |
+    |------------|-------------------------|
+    | `SAVE10`   | 10% off subtotal        |
+    | `LUXE20`   | 20% off subtotal        |
+    | `WELCOME`  | $15 fixed discount      |
+    | `FREESHIP` | Free shipping           |
+  version: "1.0.0"
+  contact:
+    name: Luxe Engineering
+    email: engineering@luxe.com
+
+servers:
+  - url: http://localhost:4000/graphql
+    description: Local development
+    production: false
+  - url: https://graphql-api.staging.luxe.com/graphql
+    description: Staging
+    production: false
+  - url: https://graphql-api.luxe.com/graphql
+    description: Production
+    production: true
+
+extensions:
+  # Provide hand-written examples for queries and mutations.
+  # SpectaQL renders these alongside the auto-generated schema docs.
+  examples:
+    - title: Fetch women's products
+      query: |
+        query GetProducts($filters: ProductListFilters) {
+          products(filters: $filters) {
+            items {
+              id slug title brand
+              images { url alt width height }
+              variants {
+                id sku title attributes
+                price {
+                  list     { amount currency }
+                  sale     { amount currency }
+                  effective { amount currency }
+                }
+                inventoryStatus availableQuantity
+              }
+              defaultVariantId tags updatedAt
+            }
+            page pageSize totalItems
+          }
+        }
+      variables: |
+        {
+          "filters": { "category": "women", "page": 1, "pageSize": 12 }
+        }
+      response: |
+        {
+          "data": {
+            "products": {
+              "items": [
+                {
+                  "id": "prod_w001",
+                  "slug": "women-essential-tee",
+                  "title": "Essential Crewneck Tee",
+                  "brand": "Luxe",
+                  "images": [{ "url": "https://placehold.co/600x800/f5e6e0/5c3d2e.png?text=Essential%20Tee", "alt": "Essential Tee front", "width": 600, "height": 800 }],
+                  "defaultVariantId": "wt001-v01",
+                  "tags": ["new-arrivals"],
+                  "updatedAt": "2025-10-01T10:00:00.000Z"
+                }
+              ],
+              "page": 1, "pageSize": 12, "totalItems": 12
+            }
+          }
+        }
+
+    - title: Sign in
+      query: |
+        mutation Login($email: String!, $password: String!) {
+          login(email: $email, password: $password) {
+            user { id email firstName lastName tier points }
+            token
+            error
+          }
+        }
+      variables: |
+        {
+          "email": "sarah.johnson@example.com",
+          "password": "Luxe2024!"
+        }
+      response: |
+        {
+          "data": {
+            "login": {
+              "user": { "id": "user_001", "email": "sarah.johnson@example.com", "firstName": "Sarah", "lastName": "Johnson", "tier": "Gold", "points": 2450 },
+              "token": "dXNlcl8wMDE6MTcxNDU2MDAwMDAwMA==",
+              "error": null
+            }
+          }
+        }
+
+    - title: Add item to cart
+      query: |
+        mutation AddCartItem($input: AddCartItemInput!) {
+          addCartItem(input: $input) {
+            cart {
+              items { id title quantity unitPrice { amount currency } lineTotal { amount currency } }
+              totals { subtotal { amount currency } total { amount currency } }
+            }
+          }
+        }
+      variables: |
+        {
+          "input": { "productId": "prod_w001", "variantId": "wt001-v01", "quantity": 1 }
+        }
+      response: |
+        {
+          "data": {
+            "addCartItem": {
+              "cart": {
+                "items": [{ "id": "item_1714560000000", "title": "Essential Crewneck Tee — XS / White", "quantity": 1, "unitPrice": { "amount": 2495, "currency": "USD" }, "lineTotal": { "amount": 2495, "currency": "USD" } }],
+                "totals": { "subtotal": { "amount": 2495, "currency": "USD" }, "total": { "amount": 4189, "currency": "USD" } }
+              }
+            }
+          }
+        }

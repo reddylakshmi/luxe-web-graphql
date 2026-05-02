@@ -8,6 +8,9 @@ import cors from 'cors';
 
 import { typeDefs } from './schema';
 import { resolvers } from './resolvers';
+import { verifyToken, type JwtPayload } from './lib/jwt';
+
+export type ApolloContext = { user: JwtPayload | null };
 
 async function start() {
   const app = express();
@@ -31,7 +34,17 @@ async function start() {
       credentials: true,
     }),
     express.json(),
-    expressMiddleware(server),
+    expressMiddleware(server, {
+      context: async ({ req }): Promise<ApolloContext> => {
+        const auth = req.headers.authorization;
+        if (!auth?.startsWith('Bearer ')) return { user: null };
+        try {
+          return { user: verifyToken(auth.slice(7)) };
+        } catch {
+          return { user: null };
+        }
+      },
+    }),
   );
 
   // Health check used by Docker / load-balancer probes

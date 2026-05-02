@@ -1,0 +1,312 @@
+{
+  "info": {
+    "name": "Luxe GraphQL API",
+    "description": "Complete GraphQL operations for the Luxe e-commerce platform.\n\n**Environments:**\n- Local dev: `{{baseUrl}}` = http://localhost:4000/graphql\n- Staging:   `{{baseUrl}}` = https://graphql-api.staging.luxe.com/graphql\n- Production:`{{baseUrl}}` = https://graphql-api.luxe.com/graphql\n\nImport `Luxe.postman_environment.json` alongside this collection to set the variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "luxe-graphql-v1"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000/graphql", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get Product List",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}", "host": ["{{baseUrl}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationName\": \"GetProducts\",\n  \"query\": \"query GetProducts($filters: ProductListFilters) {\\n  products(filters: $filters) {\\n    items {\\n      id\\n      slug\\n      title\\n      brand\\n      images { url alt width height }\\n      variants {\\n        id sku title attributes\\n        price { list { amount currency } sale { amount currency } effective { amount currency } }\\n        inventoryStatus availableQuantity\\n      }\\n      defaultVariantId tags updatedAt\\n    }\\n    page pageSize totalItems\\n  }\\n}\",\n  \"variables\": {\n    \"filters\": {\n      \"category\": \"women\",\n      \"page\": 1,\n      \"pageSize\": 12\n    }\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": [
+            {
+              "name": "200 — Women's products (page 1)",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"products\": {\n      \"items\": [\n        {\n          \"id\": \"prod_w001\",\n          \"slug\": \"women-essential-tee\",\n          \"title\": \"Essential Crewneck Tee\",\n          \"brand\": \"Luxe\",\n          \"images\": [\n            { \"url\": \"https://placehold.co/600x800/f5e6e0/5c3d2e.png?text=Essential%20Tee\", \"alt\": \"Essential Tee front\", \"width\": 600, \"height\": 800 }\n          ],\n          \"variants\": [\n            {\n              \"id\": \"wt001-v01\", \"sku\": \"WET-01\", \"title\": \"XS / White\",\n              \"attributes\": { \"size\": \"XS\", \"color\": \"White\" },\n              \"price\": { \"list\": { \"amount\": 2495, \"currency\": \"USD\" }, \"sale\": null, \"effective\": { \"amount\": 2495, \"currency\": \"USD\" } },\n              \"inventoryStatus\": \"IN_STOCK\", \"availableQuantity\": 8\n            }\n          ],\n          \"defaultVariantId\": \"wt001-v01\",\n          \"tags\": [\"new-arrivals\"],\n          \"updatedAt\": \"2025-10-01T10:00:00.000Z\"\n        }\n      ],\n      \"page\": 1,\n      \"pageSize\": 12,\n      \"totalItems\": 12\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Product by Slug",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}", "host": ["{{baseUrl}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationName\": \"GetProduct\",\n  \"query\": \"query GetProduct($slug: String!) {\\n  product(slug: $slug) {\\n    id slug title brand description categoryIds\\n    images { url alt width height }\\n    variants {\\n      id sku title attributes\\n      price { list { amount currency } sale { amount currency } effective { amount currency } }\\n      inventoryStatus availableQuantity\\n    }\\n    defaultVariantId tags updatedAt\\n  }\\n}\",\n  \"variables\": {\n    \"slug\": \"women-essential-tee\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": [
+            {
+              "name": "200 — Found",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"product\": {\n      \"id\": \"prod_w001\",\n      \"slug\": \"women-essential-tee\",\n      \"title\": \"Essential Crewneck Tee\",\n      \"brand\": \"Luxe\",\n      \"description\": \"A wardrobe staple in soft cotton jersey. Relaxed crewneck fit, perfect for everyday layering.\",\n      \"categoryIds\": [\"women\", \"women-tops\", \"new-arrivals\"],\n      \"images\": [\n        { \"url\": \"https://placehold.co/600x800/f5e6e0/5c3d2e.png?text=Essential%20Tee\", \"alt\": \"Essential Tee front\", \"width\": 600, \"height\": 800 },\n        { \"url\": \"https://placehold.co/600x800/f5e6e0/5c3d2e.png?text=Essential%20Tee+Back\", \"alt\": \"Essential Tee back\", \"width\": 600, \"height\": 800 }\n      ],\n      \"variants\": [\n        { \"id\": \"wt001-v01\", \"sku\": \"WET-01\", \"title\": \"XS / White\", \"attributes\": { \"size\": \"XS\", \"color\": \"White\" }, \"price\": { \"list\": { \"amount\": 2495, \"currency\": \"USD\" }, \"sale\": null, \"effective\": { \"amount\": 2495, \"currency\": \"USD\" } }, \"inventoryStatus\": \"IN_STOCK\", \"availableQuantity\": 8 }\n      ],\n      \"defaultVariantId\": \"wt001-v01\",\n      \"tags\": [\"new-arrivals\"],\n      \"updatedAt\": \"2025-10-01T10:00:00.000Z\"\n    }\n  }\n}"
+            },
+            {
+              "name": "200 — Not found (null)",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"product\": null\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}", "host": ["{{baseUrl}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationName\": \"SearchProducts\",\n  \"query\": \"query SearchProducts($query: String!, $page: Int, $pageSize: Int) {\\n  searchProducts(query: $query, page: $page, pageSize: $pageSize) {\\n    items { id slug title brand images { url alt } variants { id price { effective { amount currency } } inventoryStatus } defaultVariantId }\\n    page pageSize totalItems\\n  }\\n}\",\n  \"variables\": {\n    \"query\": \"jeans\",\n    \"page\": 1,\n    \"pageSize\": 10\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": [
+            {
+              "name": "200 — Results for 'jeans'",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"searchProducts\": {\n      \"items\": [\n        { \"id\": \"prod_w002\", \"slug\": \"women-slim-jeans\", \"title\": \"Slim Fit Jeans\", \"brand\": \"Luxe\", \"images\": [{ \"url\": \"https://placehold.co/600x800/f5e6e0/5c3d2e.png?text=Slim%20Jeans\", \"alt\": \"Slim Jeans front\" }], \"defaultVariantId\": \"wt002-v01\" },\n        { \"id\": \"prod_m002\", \"slug\": \"men-slim-jeans\", \"title\": \"Slim Fit Jeans\", \"brand\": \"Luxe\", \"images\": [{ \"url\": \"https://placehold.co/600x800/c4d5e8/1a2a4a.png?text=Slim%20Jeans\", \"alt\": \"Slim Jeans front\" }], \"defaultVariantId\": \"mt002-v01\" }\n      ],\n      \"page\": 1,\n      \"pageSize\": 10,\n      \"totalItems\": 4\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}", "host": ["{{baseUrl}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationName\": \"GetCart\",\n  \"query\": \"query GetCart {\\n  cart {\\n    id currency updatedAt\\n    items { id productId variantId sku title quantity unitPrice { amount currency } lineTotal { amount currency } imageUrl }\\n    promotions { code description discountTotal { amount currency } }\\n    totals { subtotal { amount currency } discounts { amount currency } shipping { amount currency } tax { amount currency } total { amount currency } }\\n  }\\n}\",\n  \"variables\": {}\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": [
+            {
+              "name": "200 — Empty cart",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"cart\": {\n      \"id\": \"cart_mock_001\",\n      \"currency\": \"USD\",\n      \"items\": [],\n      \"promotions\": [],\n      \"totals\": {\n        \"subtotal\":  { \"amount\": 0,    \"currency\": \"USD\" },\n        \"discounts\": { \"amount\": 0,    \"currency\": \"USD\" },\n        \"shipping\":  { \"amount\": 1500, \"currency\": \"USD\" },\n        \"tax\":       { \"amount\": 0,    \"currency\": \"USD\" },\n        \"total\":     { \"amount\": 1500, \"currency\": \"USD\" }\n      },\n      \"updatedAt\": \"2026-05-01T12:00:00.000Z\"\n    }\n  }\n}"
+            },
+            {
+              "name": "200 — Cart with item",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"cart\": {\n      \"id\": \"cart_mock_001\",\n      \"currency\": \"USD\",\n      \"items\": [\n        {\n          \"id\": \"item_1714560000000\",\n          \"productId\": \"prod_w001\",\n          \"variantId\": \"wt001-v01\",\n          \"sku\": \"WET-01\",\n          \"title\": \"Essential Crewneck Tee — XS / White\",\n          \"quantity\": 2,\n          \"unitPrice\": { \"amount\": 2495, \"currency\": \"USD\" },\n          \"lineTotal\": { \"amount\": 4990, \"currency\": \"USD\" },\n          \"imageUrl\": \"https://placehold.co/600x800/f5e6e0/5c3d2e.png?text=Essential%20Tee\"\n        }\n      ],\n      \"promotions\": [],\n      \"totals\": {\n        \"subtotal\":  { \"amount\": 4990, \"currency\": \"USD\" },\n        \"discounts\": { \"amount\": 0,    \"currency\": \"USD\" },\n        \"shipping\":  { \"amount\": 1500, \"currency\": \"USD\" },\n        \"tax\":       { \"amount\": 399,  \"currency\": \"USD\" },\n        \"total\":     { \"amount\": 6889, \"currency\": \"USD\" }\n      },\n      \"updatedAt\": \"2026-05-01T12:05:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}", "host": ["{{baseUrl}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationName\": \"AddCartItem\",\n  \"query\": \"mutation AddCartItem($input: AddCartItemInput!) {\\n  addCartItem(input: $input) {\\n    cart {\\n      id items { id title quantity lineTotal { amount currency } }\\n      totals { subtotal { amount currency } total { amount currency } }\\n    }\\n  }\\n}\",\n  \"variables\": {\n    \"input\": {\n      \"productId\": \"prod_w001\",\n      \"variantId\": \"wt001-v01\",\n      \"quantity\": 1\n    }\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": [
+            {
+              "name": "200 — Item added",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"addCartItem\": {\n      \"cart\": {\n        \"id\": \"cart_mock_001\",\n        \"items\": [\n          { \"id\": \"item_1714560000000\", \"title\": \"Essential Crewneck Tee — XS / White\", \"quantity\": 1, \"lineTotal\": { \"amount\": 2495, \"currency\": \"USD\" } }\n        ],\n        \"totals\": {\n          \"subtotal\": { \"amount\": 2495, \"currency\": \"USD\" },\n          \"total\":    { \"amount\": 4189, \"currency\": \"USD\" }\n        }\n      }\n    }\n  }\n}"
+            },
+            {
+              "name": "200 — Out of stock error",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"errors\": [\n    {\n      \"message\": \"This variant is out of stock\",\n      \"locations\": [{ \"line\": 2, \"column\": 3 }],\n      \"path\": [\"addCartItem\"]\n    }\n  ],\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Remove Item from Cart",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}", "host": ["{{baseUrl}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationName\": \"RemoveCartItem\",\n  \"query\": \"mutation RemoveCartItem($itemId: String!) {\\n  removeCartItem(itemId: $itemId) {\\n    cart {\\n      id items { id title quantity }\\n      totals { total { amount currency } }\\n    }\\n  }\\n}\",\n  \"variables\": {\n    \"itemId\": \"item_1714560000000\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": [
+            {
+              "name": "200 — Item removed",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"removeCartItem\": {\n      \"cart\": {\n        \"id\": \"cart_mock_001\",\n        \"items\": [],\n        \"totals\": { \"total\": { \"amount\": 1500, \"currency\": \"USD\" } }\n      }\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Cart Item Quantity",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}", "host": ["{{baseUrl}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationName\": \"UpdateCartItemQuantity\",\n  \"query\": \"mutation UpdateCartItemQuantity($input: UpdateCartItemInput!) {\\n  updateCartItemQuantity(input: $input) {\\n    cart {\\n      id items { id title quantity lineTotal { amount currency } }\\n      totals { subtotal { amount currency } total { amount currency } }\\n    }\\n  }\\n}\",\n  \"variables\": {\n    \"input\": {\n      \"itemId\": \"item_1714560000000\",\n      \"quantity\": 3\n    }\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": [
+            {
+              "name": "200 — Quantity updated",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"updateCartItemQuantity\": {\n      \"cart\": {\n        \"id\": \"cart_mock_001\",\n        \"items\": [\n          { \"id\": \"item_1714560000000\", \"title\": \"Essential Crewneck Tee — XS / White\", \"quantity\": 3, \"lineTotal\": { \"amount\": 7485, \"currency\": \"USD\" } }\n        ],\n        \"totals\": {\n          \"subtotal\": { \"amount\": 7485, \"currency\": \"USD\" },\n          \"total\":    { \"amount\": 9583, \"currency\": \"USD\" }\n        }\n      }\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Apply Promo Code",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}", "host": ["{{baseUrl}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationName\": \"ApplyPromoCode\",\n  \"query\": \"mutation ApplyPromoCode($input: ApplyPromoInput!) {\\n  applyPromoCode(input: $input) {\\n    cart {\\n      promotions { code description discountTotal { amount currency } }\\n      totals { subtotal { amount currency } discounts { amount currency } total { amount currency } }\\n    }\\n  }\\n}\",\n  \"variables\": {\n    \"input\": { \"code\": \"SAVE10\" }\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": [
+            {
+              "name": "200 — SAVE10 applied",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"applyPromoCode\": {\n      \"cart\": {\n        \"promotions\": [\n          { \"code\": \"SAVE10\", \"description\": \"10% off your order\", \"discountTotal\": { \"amount\": 749, \"currency\": \"USD\" } }\n        ],\n        \"totals\": {\n          \"subtotal\":  { \"amount\": 7485, \"currency\": \"USD\" },\n          \"discounts\": { \"amount\": 749,  \"currency\": \"USD\" },\n          \"total\":     { \"amount\": 8914, \"currency\": \"USD\" }\n        }\n      }\n    }\n  }\n}"
+            },
+            {
+              "name": "200 — Invalid promo code",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"errors\": [\n    { \"message\": \"Promo code \\\"INVALID\\\" is not valid\", \"path\": [\"applyPromoCode\"] }\n  ],\n  \"data\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}", "host": ["{{baseUrl}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationName\": \"Login\",\n  \"query\": \"mutation Login($email: String!, $password: String!) {\\n  login(email: $email, password: $password) {\\n    user {\\n      id email firstName lastName tier points phone\\n      address { line1 city state zip country }\\n      orders { id date status totalCents itemCount items }\\n      createdAt\\n    }\\n    token\\n    error\\n  }\\n}\",\n  \"variables\": {\n    \"email\": \"sarah.johnson@example.com\",\n    \"password\": \"Luxe2024!\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": [
+            {
+              "name": "200 — Success",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"login\": {\n      \"user\": {\n        \"id\": \"user_001\",\n        \"email\": \"sarah.johnson@example.com\",\n        \"firstName\": \"Sarah\",\n        \"lastName\": \"Johnson\",\n        \"tier\": \"Gold\",\n        \"points\": 2450,\n        \"phone\": \"+1 (415) 555-0182\",\n        \"address\": { \"line1\": \"1234 Pacific Heights Blvd\", \"city\": \"San Francisco\", \"state\": \"CA\", \"zip\": \"94115\", \"country\": \"US\" },\n        \"orders\": [\n          { \"id\": \"LX-204891\", \"date\": \"2026-04-18\", \"status\": \"Delivered\", \"totalCents\": 18900, \"itemCount\": 2, \"items\": [\"Essential Crewneck Tee\", \"Slim Fit Straight Jeans\"] }\n        ],\n        \"createdAt\": \"2023-08-15T10:30:00Z\"\n      },\n      \"token\": \"dXNlcl8wMDE6MTcxNDU2MDAwMDAwMA==\",\n      \"error\": null\n    }\n  }\n}"
+            },
+            {
+              "name": "200 — Invalid credentials",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"login\": {\n      \"user\": null,\n      \"token\": null,\n      \"error\": \"Invalid email or password.\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}", "host": ["{{baseUrl}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationName\": \"Register\",\n  \"query\": \"mutation Register($input: RegisterInput!) {\\n  register(input: $input) {\\n    user { id email firstName lastName tier points createdAt }\\n    token\\n    error\\n  }\\n}\",\n  \"variables\": {\n    \"input\": {\n      \"firstName\": \"Alex\",\n      \"lastName\": \"Morgan\",\n      \"email\": \"alex.morgan@example.com\",\n      \"password\": \"SecurePass1!\"\n    }\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": [
+            {
+              "name": "200 — Account created",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"register\": {\n      \"user\": {\n        \"id\": \"user_1714560000000\",\n        \"email\": \"alex.morgan@example.com\",\n        \"firstName\": \"Alex\",\n        \"lastName\": \"Morgan\",\n        \"tier\": \"Bronze\",\n        \"points\": 0,\n        \"createdAt\": \"2026-05-01T12:00:00.000Z\"\n      },\n      \"token\": \"dXNlcl8xNzE0NTYwMDAwMDAwOjE3MTQ1NjAwMDAwMDA=\",\n      \"error\": null\n    }\n  }\n}"
+            },
+            {
+              "name": "200 — Email already exists",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"register\": {\n      \"user\": null,\n      \"token\": null,\n      \"error\": \"An account with this email already exists.\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Me (Profile)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}", "host": ["{{baseUrl}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationName\": \"Me\",\n  \"query\": \"query Me($id: String!) {\\n  me(id: $id) {\\n    id email firstName lastName tier points phone\\n    address { line1 city state zip country }\\n    orders { id date status totalCents itemCount items }\\n    createdAt\\n  }\\n}\",\n  \"variables\": {\n    \"id\": \"user_001\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": [
+            {
+              "name": "200 — Profile found",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"me\": {\n      \"id\": \"user_001\",\n      \"email\": \"sarah.johnson@example.com\",\n      \"firstName\": \"Sarah\",\n      \"lastName\": \"Johnson\",\n      \"tier\": \"Gold\",\n      \"points\": 2450,\n      \"phone\": \"+1 (415) 555-0182\",\n      \"address\": { \"line1\": \"1234 Pacific Heights Blvd\", \"city\": \"San Francisco\", \"state\": \"CA\", \"zip\": \"94115\", \"country\": \"US\" },\n      \"orders\": [\n        { \"id\": \"LX-204891\", \"date\": \"2026-04-18\", \"status\": \"Delivered\", \"totalCents\": 18900, \"itemCount\": 2, \"items\": [\"Essential Crewneck Tee\", \"Slim Fit Straight Jeans\"] }\n      ],\n      \"createdAt\": \"2023-08-15T10:30:00Z\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

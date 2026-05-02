@@ -1,0 +1,244 @@
+[
+  {
+    "id": "user_001",
+    "email": "sarah.johnson@example.com",
+    "passwordHash": "Luxe2024!",
+    "firstName": "Sarah",
+    "lastName": "Johnson",
+    "tier": "Gold",
+    "points": 2450,
+    "phone": "+1 (415) 555-0182",
+    "address": {
+      "line1": "1234 Pacific Heights Blvd",
+      "city": "San Francisco",
+      "state": "CA",
+      "zip": "94115",
+      "country": "US"
+    },
+    "orders": [
+      {
+        "id": "LX-204891",
+        "date": "2026-04-18",
+        "status": "Delivered",
+        "totalCents": 18900,
+        "itemCount": 2,
+        "items": [
+          "Essential Crewneck Tee",
+          "Slim Fit Straight Jeans"
+        ]
+      },
+      {
+        "id": "LX-198234",
+        "date": "2026-03-05",
+        "status": "Delivered",
+        "totalCents": 24500,
+        "itemCount": 3,
+        "items": [
+          "Floral Midi Wrap Dress",
+          "Linen-Blend Blazer",
+          "Ribbed Turtleneck Sweater"
+        ]
+      },
+      {
+        "id": "LX-187001",
+        "date": "2026-01-22",
+        "status": "Delivered",
+        "totalCents": 8900,
+        "itemCount": 1,
+        "items": [
+          "A-Line Midi Skirt"
+        ]
+      }
+    ],
+    "paymentMethods": [
+      {
+        "id": "pm_u001_01",
+        "brand": "Visa",
+        "last4": "4242",
+        "expMonth": 8,
+        "expYear": 2027,
+        "cardholderName": "Sarah Johnson",
+        "isDefault": true
+      },
+      {
+        "id": "pm_u001_02",
+        "brand": "Mastercard",
+        "last4": "5555",
+        "expMonth": 3,
+        "expYear": 2026,
+        "cardholderName": "Sarah M Johnson",
+        "isDefault": false
+      }
+    ],
+    "createdAt": "2023-08-15T10:30:00Z"
+  },
+  {
+    "id": "user_002",
+    "email": "james.chen@example.com",
+    "passwordHash": "ShopLuxe1!",
+    "firstName": "James",
+    "lastName": "Chen",
+    "tier": "Silver",
+    "points": 890,
+    "phone": "+1 (212) 555-0134",
+    "address": {
+      "line1": "56 West 77th Street, Apt 8B",
+      "city": "New York",
+      "state": "NY",
+      "zip": "10024",
+      "country": "US"
+    },
+    "orders": [
+      {
+        "id": "LX-206112",
+        "date": "2026-04-27",
+        "status": "Shipped",
+        "totalCents": 14500,
+        "itemCount": 2,
+        "items": [
+          "Oxford Cloth Button-Down",
+          "Slim Fit Chino"
+        ]
+      },
+      {
+        "id": "LX-201334",
+        "date": "2026-02-14",
+        "status": "Delivered",
+        "totalCents": 9800,
+        "itemCount": 1,
+        "items": [
+          "Denim Trucker Jacket"
+        ]
+      }
+    ],
+    "paymentMethods": [
+      {
+        "id": "pm_u002_01",
+        "brand": "Mastercard",
+        "last4": "4444",
+        "expMonth": 11,
+        "expYear": 2027,
+        "cardholderName": "James Chen",
+        "isDefault": true
+      }
+    ],
+    "createdAt": "2024-01-22T14:45:00Z"
+  },
+  {
+    "id": "user_003",
+    "email": "emma.davis@example.com",
+    "passwordHash": "Fashion23!",
+    "firstName": "Emma",
+    "lastName": "Davis",
+    "tier": "Platinum",
+    "points": 8200,
+    "phone": "+1 (312) 555-0267",
+    "address": {
+      "line1": "890 N Michigan Ave, Suite 400",
+      "city": "Chicago",
+      "state": "IL",
+      "zip": "60611",
+      "country": "US"
+    },
+    "orders": [
+      {
+        "id": "LX-206980",
+        "date": "2026-04-30",
+        "status": "Processing",
+        "totalCents": 38600,
+        "itemCount": 4,
+        "items": [
+          "Floral Midi Wrap Dress",
+          "Linen-Blend Blazer",
+          "Essential Crewneck Tee",
+          "A-Line Midi Skirt"
+        ]
+      },
+      {
+        "id": "LX-204501",
+        "date": "2026-04-12",
+        "status": "Delivered",
+        "totalCents": 21200,
+        "itemCount": 2,
+        "items": [
+          "Cropped Utility Jacket",
+          "Slim Fit Jeans"
+        ]
+      },
+      {
+        "id": "LX-199887",
+        "date": "2026-03-18",
+        "status": "Delivered",
+        "totalCents": 16400,
+        "itemCount": 3,
+        "items": [
+          "Vintage Soft Tee",
+          "Ribbed Turtleneck Sweater",
+          "A-Line Midi Skirt"
+        ]
+      }
+    ],
+    "paymentMethods": [
+      {
+        "id": "pm_u003_01",
+        "brand": "Amex",
+        "last4": "0005",
+        "expMonth": 5,
+        "expYear": 2028,
+        "cardholderName": "Emma Davis",
+        "isDefault": true
+      },
+      {
+        "id": "pm_u003_02",
+        "brand": "Visa",
+        "last4": "1234",
+        "expMonth": 12,
+        "expYear": 2026,
+        "cardholderName": "E Davis",
+        "isDefault": false
+      }
+    ],
+    "createdAt": "2022-11-08T09:15:00Z"
+  },
+  {
+    "id": "user_004",
+    "email": "michael.torres@example.com",
+    "passwordHash": "MensFashion1!",
+    "firstName": "Michael",
+    "lastName": "Torres",
+    "tier": "Bronze",
+    "points": 220,
+    "phone": "+1 (310) 555-0398",
+    "address": {
+      "line1": "4521 Sunset Blvd, Unit 12",
+      "city": "Los Angeles",
+      "state": "CA",
+      "zip": "90027",
+      "country": "US"
+    },
+    "orders": [
+      {
+        "id": "LX-205670",
+        "date": "2026-04-21",
+        "status": "Delivered",
+        "totalCents": 9500,
+        "itemCount": 1,
+        "items": [
+          "Performance Polo"
+        ]
+      }
+    ],
+    "paymentMethods": [
+      {
+        "id": "pm_u004_01",
+        "brand": "Discover",
+        "last4": "6789",
+        "expMonth": 9,
+        "expYear": 2027,
+        "cardholderName": "Michael Torres",
+        "isDefault": true
+      }
+    ],
+    "createdAt": "2025-10-05T16:20:00Z"
+  }
+]

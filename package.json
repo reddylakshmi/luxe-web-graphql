@@ -8,7 +8,9 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "start:staging": "APP_ENV=staging node dist/server.js",
-    "start:production": "APP_ENV=production node dist/server.js"
+    "start:production": "APP_ENV=production node dist/server.js",
+    "docs": "spectaql docs/spectaql.config.yml",
+    "docs:serve": "spectaql docs/spectaql.config.yml --development-mode"
   },
   "dependencies": {
     "@apollo/server": "^4.11.3",
@@ -16,12 +18,15 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "graphql": "^16.9.0",
+    "jsonwebtoken": "^9.0.3",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.17.6",
+    "spectaql": "^3.0.9",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }

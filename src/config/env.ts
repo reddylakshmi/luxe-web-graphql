@@ -42,6 +42,13 @@ const EnvSchema = z.object({
 
   // Bearer token / API key for authenticating with the Java REST API
   JAVA_API_KEY: z.string().optional(),
+
+  // JWT signing secret used in mock mode.
+  // In production Okta signs tokens with RS256; this secret is never used then.
+  MOCK_JWT_SECRET: z.string().default('mock-jwt-secret-dev-only-change-in-production'),
+
+  // How long issued tokens stay valid (seconds). Default: 1 hour, matching Okta default.
+  JWT_EXPIRY_SECONDS: z.coerce.number().int().positive().default(3600),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

@@ -1,0 +1,26 @@
+[
+  {
+    "code": "SAVE10",
+    "type": "percentage",
+    "value": 10,
+    "description": "10% off your order"
+  },
+  {
+    "code": "LUXE20",
+    "type": "percentage",
+    "value": 20,
+    "description": "20% off your order"
+  },
+  {
+    "code": "WELCOME",
+    "type": "fixed",
+    "value": 1500,
+    "description": "$15 off first order"
+  },
+  {
+    "code": "FREESHIP",
+    "type": "shipping",
+    "value": 0,
+    "description": "Free shipping"
+  }
+]
