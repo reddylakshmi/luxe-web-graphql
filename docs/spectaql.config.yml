@@ -1,13 +1,12 @@
 spectaql:
-  # Output directory — open docs/index.html in a browser after running `npm run docs`
+  # Output directory — open docs/out/index.html in a browser after running `npm run docs`
   targetDir: ./docs/out
   displayAllServers: true
 
 introspection:
-  # SpectaQL introspects the running server OR reads the SDL directly.
-  # Use schemaFile (no server needed) for CI / offline generation.
-  schemaFile: ./src/schema.ts
-  # When the server is running, you can switch to live introspection:
+  # schema.graphql is auto-generated from src/schema.ts via: npx tsx scripts/generate-schema.ts
+  # Switch to the url line below for live introspection when the server is running.
+  schemaFile: ./schema.graphql
   # url: http://localhost:4000/graphql
 
 info:
@@ -16,7 +15,7 @@ info:
     ## Overview
     The Luxe GraphQL API powers the Luxe e-commerce storefront.
 
-    All amounts are expressed in **cents (USD)** — e.g. `2495` = $24.95.
+    All monetary amounts are expressed in **cents (USD)** — e.g. `2495` = $24.95.
 
     ## Environments
 
@@ -27,23 +26,25 @@ info:
     | Production  | `https://graphql-api.luxe.com/graphql` |
 
     ## Data source
-    - **Mock mode** (default): resolvers read from `data/*.json` files.
-      No external dependencies.
-    - **Production mode**: set `JAVA_API_URL` in `.env` to proxy all
-      operations to the Java REST backend. No schema or query changes required.
+    - **Mock mode** (default): resolvers read from in-process TypeScript data files. No external dependencies.
+    - **Production mode**: set `JAVA_API_URL` in `.env` to proxy all operations to the Java REST backend. No schema or query changes required.
 
     ## Authentication
-    The `login` and `register` mutations simulate Okta's Authorization Server
-    in mock mode. In production they delegate to the Java auth service which
-    validates Okta JWTs. Pass the returned `token` as `Authorization: Bearer <token>`.
+    `login` and `register` simulate Okta's Authorization Server in mock mode.
+    In production they delegate to the Java auth service. Pass the returned `token` as:
+    ```
+    Authorization: Bearer <token>
+    ```
+    Protected operations: `me`.
 
-    ## Promo codes (mock)
-    | Code       | Effect                  |
-    |------------|-------------------------|
-    | `SAVE10`   | 10% off subtotal        |
-    | `LUXE20`   | 20% off subtotal        |
-    | `WELCOME`  | $15 fixed discount      |
-    | `FREESHIP` | Free shipping           |
+    ## Promo codes (mock mode)
+
+    | Code       | Effect             |
+    |------------|--------------------|
+    | `SAVE10`   | 10% off subtotal   |
+    | `LUXE20`   | 20% off subtotal   |
+    | `WELCOME`  | $15 fixed discount |
+    | `FREESHIP` | Free shipping      |
   version: "1.0.0"
   contact:
     name: Luxe Engineering
@@ -61,21 +62,23 @@ servers:
     production: true
 
 extensions:
-  # Provide hand-written examples for queries and mutations.
-  # SpectaQL renders these alongside the auto-generated schema docs.
   examples:
-    - title: Fetch women's products
+
+    # ── Products ────────────────────────────────────────────────────────────────
+
+    - title: List women's products (paginated)
       query: |
         query GetProducts($filters: ProductListFilters) {
           products(filters: $filters) {
             items {
-              id slug title brand
+              id slug title brand isBestSeller
+              rating reviewCount
               images { url alt width height }
               variants {
                 id sku title attributes
                 price {
-                  list     { amount currency }
-                  sale     { amount currency }
+                  list      { amount currency }
+                  sale      { amount currency }
                   effective { amount currency }
                 }
                 inventoryStatus availableQuantity
@@ -86,29 +89,298 @@ extensions:
           }
         }
       variables: |
-        {
-          "filters": { "category": "women", "page": 1, "pageSize": 12 }
-        }
+        { "filters": { "category": "women", "page": 1, "pageSize": 12 } }
       response: |
         {
           "data": {
             "products": {
-              "items": [
-                {
-                  "id": "prod_w001",
-                  "slug": "women-essential-tee",
-                  "title": "Essential Crewneck Tee",
-                  "brand": "Luxe",
-                  "images": [{ "url": "https://placehold.co/600x800/f5e6e0/5c3d2e.png?text=Essential%20Tee", "alt": "Essential Tee front", "width": 600, "height": 800 }],
-                  "defaultVariantId": "wt001-v01",
-                  "tags": ["new-arrivals"],
-                  "updatedAt": "2025-10-01T10:00:00.000Z"
-                }
-              ],
+              "items": [{
+                "id": "prod_w001",
+                "slug": "women-essential-tee",
+                "title": "Essential Crewneck Tee",
+                "brand": "Luxe",
+                "isBestSeller": true,
+                "rating": 4.7,
+                "reviewCount": 312,
+                "images": [{ "url": "https://placehold.co/600x800/F0E6D3/8B6343.png", "alt": "Women top front", "width": 600, "height": 800 }],
+                "defaultVariantId": "wt001-v01",
+                "tags": ["new-arrivals"],
+                "updatedAt": "2025-10-01T10:00:00.000Z"
+              }],
               "page": 1, "pageSize": 12, "totalItems": 12
             }
           }
         }
+
+    - title: Get a single product by slug
+      query: |
+        query GetProduct($slug: String!) {
+          product(slug: $slug) {
+            id slug title brand description
+            isBestSeller rating reviewCount
+            fitTypes details sizeFit fabricCare shippingReturns
+            images { url alt width height }
+            variants {
+              id sku title attributes
+              price { list { amount } sale { amount } effective { amount currency } }
+              inventoryStatus availableQuantity
+            }
+            defaultVariantId categoryIds tags updatedAt
+          }
+        }
+      variables: |
+        { "slug": "women-essential-tee" }
+      response: |
+        {
+          "data": {
+            "product": {
+              "id": "prod_w001",
+              "slug": "women-essential-tee",
+              "title": "Essential Crewneck Tee",
+              "brand": "Luxe",
+              "isBestSeller": true,
+              "rating": 4.7,
+              "reviewCount": 312,
+              "fitTypes": ["Regular", "Petite"],
+              "details": ["100% combed and ring-spun cotton", "Pre-shrunk fabric"],
+              "sizeFit": "Model is 5'9\" wearing size S. Fits true to size.",
+              "fabricCare": "Machine wash cold. Tumble dry low.",
+              "shippingReturns": "Free shipping on orders over $100. Free returns within 30 days."
+            }
+          }
+        }
+
+    - title: Search products
+      query: |
+        query Search($query: String!) {
+          searchProducts(query: $query, page: 1, pageSize: 8) {
+            items { id slug title brand rating reviewCount }
+            totalItems
+          }
+        }
+      variables: |
+        { "query": "linen blazer" }
+      response: |
+        {
+          "data": {
+            "searchProducts": {
+              "items": [{ "id": "prod_w004", "slug": "women-linen-blazer", "title": "Linen-Blend Blazer", "brand": "Luxe", "rating": 4.6, "reviewCount": 158 }],
+              "totalItems": 1
+            }
+          }
+        }
+
+    # ── Engagement ───────────────────────────────────────────────────────────────
+
+    - title: Fetch product reviews (paginated)
+      query: |
+        query GetReviews($productId: ID!, $page: Int) {
+          productReviews(productId: $productId, page: $page, pageSize: 10) {
+            items {
+              id userName rating title body date
+              helpfulCount verifiedPurchase photos
+            }
+            page pageSize totalItems
+          }
+        }
+      variables: |
+        { "productId": "prod_w001", "page": 1 }
+      response: |
+        {
+          "data": {
+            "productReviews": {
+              "items": [{
+                "id": "rev_w001_01",
+                "userName": "EmilyChen",
+                "rating": 5,
+                "title": "Perfect everyday tee",
+                "body": "Soft, true to size, washes beautifully. Have bought it in three colours.",
+                "date": "2025-09-15T00:00:00.000Z",
+                "helpfulCount": 47,
+                "verifiedPurchase": true,
+                "photos": []
+              }],
+              "page": 1, "pageSize": 10, "totalItems": 48
+            }
+          }
+        }
+
+    - title: Fetch customer photos
+      query: |
+        query GetCustomerPhotos($productId: ID!) {
+          customerPhotos(productId: $productId) {
+            id userName imageUrl caption date likes
+          }
+        }
+      variables: |
+        { "productId": "prod_w001" }
+      response: |
+        {
+          "data": {
+            "customerPhotos": [
+              { "id": "cp_w001_01", "userName": "StyleByAva", "imageUrl": "https://placehold.co/400x500/f0e6d3/8b6343.jpg", "caption": "Love how it fits!", "date": "2025-09-20T00:00:00.000Z", "likes": 23 }
+            ]
+          }
+        }
+
+    - title: Wear It With recommendations
+      query: |
+        query WearItWith($productId: ID!) {
+          wearItWith(productId: $productId) {
+            id slug title
+            images { url alt }
+            variants { price { effective { amount currency } } inventoryStatus }
+          }
+        }
+      variables: |
+        { "productId": "prod_w001" }
+      response: |
+        {
+          "data": {
+            "wearItWith": [
+              { "id": "prod_w002", "slug": "women-slim-jeans", "title": "Slim Fit Jeans",
+                "images": [{ "url": "https://placehold.co/600x800/D5E0EA/2A4A6A.png", "alt": "Women jeans front" }] }
+            ]
+          }
+        }
+
+    - title: Customers also liked
+      query: |
+        query AlsoLiked($productId: ID!) {
+          customersAlsoLiked(productId: $productId) {
+            id slug title rating reviewCount
+            images { url alt }
+            variants { price { effective { amount currency } } }
+          }
+        }
+      variables: |
+        { "productId": "prod_w001" }
+
+    - title: Customers also purchased
+      query: |
+        query AlsoPurchased($productId: ID!) {
+          customersAlsoPurchased(productId: $productId) {
+            id slug title
+            images { url alt }
+            variants { price { effective { amount currency } } inventoryStatus }
+          }
+        }
+      variables: |
+        { "productId": "prod_w001" }
+
+    - title: Find nearby stores
+      query: |
+        query NearbyStores($productId: ID!, $zipCode: String) {
+          nearbyStores(productId: $productId, zipCode: $zipCode) {
+            id name address city state zip phone
+            distance hasInventory hours
+          }
+        }
+      variables: |
+        { "productId": "prod_w001", "zipCode": "10001" }
+      response: |
+        {
+          "data": {
+            "nearbyStores": [
+              { "id": "store_nyc_01", "name": "Luxe Fifth Avenue", "address": "725 Fifth Avenue",
+                "city": "New York", "state": "NY", "zip": "10022", "phone": "(212) 555-0101",
+                "distance": 1.2, "hasInventory": true, "hours": "Mon–Sat 10am–9pm, Sun 11am–7pm" }
+            ]
+          }
+        }
+
+    # ── Cart ─────────────────────────────────────────────────────────────────────
+
+    - title: View cart
+      query: |
+        query GetCart {
+          cart {
+            id currency
+            items {
+              id productId variantId sku title quantity
+              unitPrice  { amount currency }
+              lineTotal  { amount currency }
+              imageUrl
+            }
+            promotions { code description discountTotal { amount currency } }
+            totals {
+              subtotal  { amount currency }
+              discounts { amount currency }
+              shipping  { amount currency }
+              tax       { amount currency }
+              total     { amount currency }
+            }
+            updatedAt
+          }
+        }
+      response: |
+        {
+          "data": {
+            "cart": {
+              "id": "cart_001", "currency": "USD",
+              "items": [{ "id": "item_01", "title": "Essential Crewneck Tee — S / White", "quantity": 2,
+                "unitPrice": { "amount": 2495, "currency": "USD" }, "lineTotal": { "amount": 4990, "currency": "USD" } }],
+              "promotions": [],
+              "totals": {
+                "subtotal":  { "amount": 4990, "currency": "USD" },
+                "discounts": { "amount": 0,    "currency": "USD" },
+                "shipping":  { "amount": 794,  "currency": "USD" },
+                "tax":       { "amount": 411,  "currency": "USD" },
+                "total":     { "amount": 6195, "currency": "USD" }
+              }
+            }
+          }
+        }
+
+    - title: Add item to cart
+      query: |
+        mutation AddCartItem($input: AddCartItemInput!) {
+          addCartItem(input: $input) {
+            cart {
+              items { id title quantity lineTotal { amount currency } }
+              totals { total { amount currency } }
+            }
+          }
+        }
+      variables: |
+        { "input": { "productId": "prod_w001", "variantId": "wt001-v01", "quantity": 1 } }
+      response: |
+        {
+          "data": {
+            "addCartItem": {
+              "cart": {
+                "items": [{ "id": "item_01", "title": "Essential Crewneck Tee — S / White", "quantity": 1, "lineTotal": { "amount": 2495, "currency": "USD" } }],
+                "totals": { "total": { "amount": 4083, "currency": "USD" } }
+              }
+            }
+          }
+        }
+
+    - title: Apply promo code
+      query: |
+        mutation ApplyPromo($input: ApplyPromoInput!) {
+          applyPromoCode(input: $input) {
+            cart {
+              promotions { code description discountTotal { amount currency } }
+              totals { discounts { amount } total { amount currency } }
+            }
+          }
+        }
+      variables: |
+        { "input": { "code": "SAVE10" } }
+      response: |
+        {
+          "data": {
+            "applyPromoCode": {
+              "cart": {
+                "promotions": [{ "code": "SAVE10", "description": "10% off your order", "discountTotal": { "amount": 250, "currency": "USD" } }],
+                "totals": { "discounts": { "amount": 250 }, "total": { "amount": 3833, "currency": "USD" } }
+              }
+            }
+          }
+        }
+
+    # ── Auth ─────────────────────────────────────────────────────────────────────
 
     - title: Sign in
       query: |
@@ -120,43 +392,61 @@ extensions:
           }
         }
       variables: |
-        {
-          "email": "sarah.johnson@example.com",
-          "password": "Luxe2024!"
-        }
+        { "email": "sarah.johnson@example.com", "password": "Luxe2024!" }
       response: |
         {
           "data": {
             "login": {
-              "user": { "id": "user_001", "email": "sarah.johnson@example.com", "firstName": "Sarah", "lastName": "Johnson", "tier": "Gold", "points": 2450 },
-              "token": "dXNlcl8wMDE6MTcxNDU2MDAwMDAwMA==",
+              "user": { "id": "user_001", "email": "sarah.johnson@example.com",
+                "firstName": "Sarah", "lastName": "Johnson", "tier": "Gold", "points": 2450 },
+              "token": "eyJhbGciOiJIUzI1NiJ9...",
               "error": null
             }
           }
         }
 
-    - title: Add item to cart
+    - title: Register new account
       query: |
-        mutation AddCartItem($input: AddCartItemInput!) {
-          addCartItem(input: $input) {
-            cart {
-              items { id title quantity unitPrice { amount currency } lineTotal { amount currency } }
-              totals { subtotal { amount currency } total { amount currency } }
-            }
+        mutation Register($input: RegisterInput!) {
+          register(input: $input) {
+            user { id email firstName lastName tier points }
+            token
+            error
           }
         }
       variables: |
+        { "input": { "firstName": "Alex", "lastName": "Kim", "email": "alex.kim@example.com", "password": "Secure123!" } }
+      response: |
         {
-          "input": { "productId": "prod_w001", "variantId": "wt001-v01", "quantity": 1 }
+          "data": {
+            "register": {
+              "user": { "id": "user_099", "email": "alex.kim@example.com",
+                "firstName": "Alex", "lastName": "Kim", "tier": "Bronze", "points": 0 },
+              "token": "eyJhbGciOiJIUzI1NiJ9...",
+              "error": null
+            }
+          }
+        }
+
+    - title: Get current user profile (authenticated)
+      query: |
+        query Me {
+          me {
+            id email firstName lastName tier points phone
+            address { line1 city state zip country }
+            paymentMethods { id brand last4 expMonth expYear isDefault }
+            orders { id date status totalCents itemCount }
+          }
         }
       response: |
         {
           "data": {
-            "addCartItem": {
-              "cart": {
-                "items": [{ "id": "item_1714560000000", "title": "Essential Crewneck Tee — XS / White", "quantity": 1, "unitPrice": { "amount": 2495, "currency": "USD" }, "lineTotal": { "amount": 2495, "currency": "USD" } }],
-                "totals": { "subtotal": { "amount": 2495, "currency": "USD" }, "total": { "amount": 4189, "currency": "USD" } }
-              }
+            "me": {
+              "id": "user_001", "email": "sarah.johnson@example.com",
+              "firstName": "Sarah", "lastName": "Johnson", "tier": "Gold", "points": 2450,
+              "address": { "line1": "123 Fifth Ave", "city": "New York", "state": "NY", "zip": "10001", "country": "US" },
+              "paymentMethods": [{ "id": "pm_01", "brand": "Visa", "last4": "4242", "expMonth": 12, "expYear": 2027, "isDefault": true }],
+              "orders": [{ "id": "ord_001", "date": "2025-09-01", "status": "delivered", "totalCents": 12490, "itemCount": 3 }]
             }
           }
         }

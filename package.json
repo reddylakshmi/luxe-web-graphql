@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "start:staging": "APP_ENV=staging node dist/server.js",
     "start:production": "APP_ENV=production node dist/server.js",
+    "predocs": "tsx scripts/generate-schema.ts",
     "docs": "spectaql docs/spectaql.config.yml",
     "docs:serve": "spectaql docs/spectaql.config.yml --development-mode"
   },
